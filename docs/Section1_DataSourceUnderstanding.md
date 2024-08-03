@@ -14,9 +14,9 @@ A platform for managing and optimizing advertising campaigns across Facebook's e
 *	API: Managed through the Facebook Marketing API, a subset of the Graph API.
 *	Authentication: Uses OAuth 2.0, ensuring secure access to your data.
 *	Endpoints: here are some of the most used endpoints:
-  *	/act_{ad_account_id}/ads: For ad management.
-  *	/act_{ad_account_id}/adsets: For ad set management.
-  *	/act_{ad_account_id}/campaigns: For campaign management.
+  -	/act_{ad_account_id}/ads: For ad management.
+  -	/act_{ad_account_id}/adsets: For ad set management.
+  -	/act_{ad_account_id}/campaigns: For campaign management.
 * Rate Limits: Rate limits are in place to manage usage and prevent excessive load, with batch requests helping to optimize performance.
 
 #### Data Types:
