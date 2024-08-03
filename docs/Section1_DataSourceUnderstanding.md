@@ -18,7 +18,7 @@ A platform for managing and optimizing advertising campaigns across Facebook's e
 - **Hierarchy**: Facebook Ads organizes data into Campaigns, Ad Sets, and Ads. At the top, Campaigns set the overall strategy and budget. Ad Sets are nested within Campaigns and define targeting options and schedules. Ads, the lowest level, are the actual creatives displayed to users.
 - **Purpose**: This setup allows for detailed management and optimization of advertising efforts, making it easier to track performance at various levels.
 
-![Facebook Ad Datastructure](../diagram/facebook_ad_datastructure.png)
+![Facebook Ad Datastructure](../diagram/facebook_ad_datastructure.PNG)
 
 ### API Access:
 - **API**: Managed through the Facebook Marketing API, a subset of the Graph API.
@@ -34,7 +34,7 @@ A platform for managing and optimizing advertising campaigns across Facebook's e
 - **Attributes**: Details such as ad name, ID, campaign ID, targeting details, and creative content.
 - **Format**: Data is returned in JSON format, making it easy to parse and integrate.
 
-![google Ad Datastructure](../diagram/google_ad_datastructure.png)
+![google Ad Datastructure](../diagram/google_ad_datastructure.PNG)
 
 ## Google Ads
 A service for creating and managing online ads that appear in Google search results and across its advertising network.
