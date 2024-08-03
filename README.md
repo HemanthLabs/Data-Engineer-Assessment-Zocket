@@ -14,7 +14,7 @@ This project demonstrates the design and implementation of ETL pipelines for ext
 - [Section 9: Documentation and Collaboration](docs/Section9_DocumentationCollaboration.md)
 - [Section 10: Real-world Scenario](docs/Section10_RealWorldScenario.md)
 
-## Diagram
+## ETL Pipeline Architecture
 ![ETL Pipeline Diagram](diagram/ETL_Pipeline_Diagram.png)
 
 ## Video Explanation
