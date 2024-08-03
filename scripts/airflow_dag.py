@@ -1,78 +1,144 @@
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
-from airflow.providers.amazon.aws.transfers.s3_to_rds import S3ToRDSOperator
+from airflow.hooks.base_hook import BaseHook
 from datetime import datetime, timedelta
+import requests
+import json
+import psycopg2
 
-# Define default arguments for the DAG
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2024, 8, 1),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
 
-# Define the DAG
 dag = DAG(
-    'etl_facebook_google_to_rds',
+    'etl_pipeline',
     default_args=default_args,
-    description='ETL pipeline from Facebook and Google Ads to RDS',
+    description='ETL pipeline for Facebook Ads and Google Ads',
     schedule_interval=timedelta(days=1),
-    catchup=False,
 )
 
-# Define Python functions for data extraction and transformation
-def extract_facebook_ads(**kwargs):
-    # Code to extract data from Facebook Ads API
-    pass
+def fetch_facebook_ads_data():
+    connection = BaseHook.get_connection('facebook_ads')
+    headers = {
+        'Authorization': f'Bearer {connection.password}',
+    }
+    url = 'https://graph.facebook.com/v12.0/me/ads'
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    with open('/tmp/facebook_ads_data.json', 'w') as f:
+        json.dump(data, f)
 
-def extract_google_ads(**kwargs):
-    # Code to extract data from Google Ads API
-    pass
+def fetch_google_ads_data():
+    connection = BaseHook.get_connection('google_ads')
+    headers = {
+        'Authorization': f'Bearer {connection.password}',
+    }
+    url = 'https://googleads.googleapis.com/v10/customers/1234567890/googleAds:searchStream'
+    response = requests.post(url, headers=headers)
+    data = response.json()
+    with open('/tmp/google_ads_data.json', 'w') as f:
+        json.dump(data, f)
 
-def transform_data(**kwargs):
-    # Code to transform extracted data
-    pass
+def transform_data():
+    # Transform Facebook Ads data
+    with open('/tmp/facebook_ads_data.json') as f:
+        facebook_ads_data = json.load(f)
+    transformed_facebook_ads_data = [
+        {
+            'ad_id': ad['id'],
+            'ad_name': ad['name'],
+            'impressions': ad['impressions'],
+            'clicks': ad['clicks'],
+            'spend': ad['spend'],
+        }
+        for ad in facebook_ads_data['data']
+    ]
+    
+    # Transform Google Ads data
+    with open('/tmp/google_ads_data.json') as f:
+        google_ads_data = json.load(f)
+    transformed_google_ads_data = [
+        {
+            'campaign_id': campaign['id'],
+            'campaign_name': campaign['name'],
+            'impressions': campaign['metrics']['impressions'],
+            'clicks': campaign['metrics']['clicks'],
+            'cost_micros': campaign['metrics']['cost_micros'],
+        }
+        for campaign in google_ads_data['results']
+    ]
 
-# Define the tasks
-start = DummyOperator(task_id='start', dag=dag)
+    # Save transformed data
+    with open('/tmp/transformed_facebook_ads_data.json', 'w') as f:
+        json.dump(transformed_facebook_ads_data, f)
+    with open('/tmp/transformed_google_ads_data.json', 'w') as f:
+        json.dump(transformed_google_ads_data, f)
 
-extract_facebook_task = PythonOperator(
-    task_id='extract_facebook_ads',
-    python_callable=extract_facebook_ads,
-    provide_context=True,
+def load_data_to_rds():
+    connection = BaseHook.get_connection('rds_postgres')
+    conn = psycopg2.connect(
+        host=connection.host,
+        port=connection.port,
+        user=connection.login,
+        password=connection.password,
+        dbname=connection.schema
+    )
+    cursor = conn.cursor()
+
+    with open('/tmp/transformed_facebook_ads_data.json') as f:
+        facebook_ads_data = json.load(f)
+    for ad in facebook_ads_data:
+        cursor.execute(
+            """
+            INSERT INTO facebook_ads (ad_id, ad_name, impressions, clicks, spend)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (ad['ad_id'], ad['ad_name'], ad['impressions'], ad['clicks'], ad['spend'])
+        )
+
+    with open('/tmp/transformed_google_ads_data.json') as f:
+        google_ads_data = json.load(f)
+    for campaign in google_ads_data:
+        cursor.execute(
+            """
+            INSERT INTO google_ads (campaign_id, campaign_name, impressions, clicks, cost_micros)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (campaign['campaign_id'], campaign['campaign_name'], campaign['impressions'], campaign['clicks'], campaign['cost_micros'])
+        )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+fetch_facebook_ads_task = PythonOperator(
+    task_id='fetch_facebook_ads_data',
+    python_callable=fetch_facebook_ads_data,
     dag=dag,
 )
 
-extract_google_task = PythonOperator(
-    task_id='extract_google_ads',
-    python_callable=extract_google_ads,
-    provide_context=True,
+fetch_google_ads_task = PythonOperator(
+    task_id='fetch_google_ads_data',
+    python_callable=fetch_google_ads_data,
     dag=dag,
 )
 
-transform_task = PythonOperator(
+transform_data_task = PythonOperator(
     task_id='transform_data',
     python_callable=transform_data,
-    provide_context=True,
     dag=dag,
 )
 
-load_to_rds_task = S3ToRDSOperator(
-    task_id='load_to_rds',
-    schema='public',
-    table='ads_data',
-    s3_bucket='my-s3-bucket',
-    s3_key='transformed/ads_data.csv',
-    aws_conn_id='aws_default',
-    postgres_conn_id='postgres_default',
+load_data_to_rds_task = PythonOperator(
+    task_id='load_data_to_rds',
+    python_callable=load_data_to_rds,
     dag=dag,
 )
 
-end = DummyOperator(task_id='end', dag=dag)
-
-# Set task dependencies
-start >> [extract_facebook_task, extract_google_task] >> transform_task >> load_to_rds_task >> end
+fetch_facebook_ads_task >> fetch_google_ads_task >> transform_data_task >> load_data_to_rds_task
