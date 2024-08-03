@@ -1,5 +1,16 @@
 # Differences Between Facebook Ads, Google Ads, RDS, and CleverTap
 
+Understanding the distinct characteristics of various data sources is crucial for designing effective ETL pipelines. The following table summarizes the key differences between Facebook Ads, Google Ads, RDS, and CleverTap in terms of data structure, API access, data types, extraction frequency, and scalability.
+
+| Feature                 | Facebook Ads                                                | Google Ads                                                 | RDS (Relational Database Service)                     | CleverTap                                                   |
+|-------------------------|-------------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------|
+| **Data Structure**      | JSON format with nested fields                              | JSON or CSV format                                         | Structured, relational tables (SQL)                   | JSON format with nested fields                              |
+| **API Access**          | OAuth 2.0 for authentication                                | OAuth 2.0 for authentication                               | SQL queries over JDBC/ODBC connections                | API key for authentication                                  |
+| **Data Types**          | Ad metrics, user engagement data, demographic information   | Ad performance metrics, click data, cost data              | Relational data, transactional records                | User engagement data, event tracking, profile data          |
+| **Extraction Frequency**| Real-time or periodic data extraction                      | Real-time or periodic data extraction                      | Periodic data extraction based on transactional updates | Real-time or periodic data extraction                      |
+| **Scalability**         | High, can handle large volumes of advertising data          | High, designed for large-scale advertising campaigns       | Depends on the database engine and instance type      | High, scalable for large volumes of user interaction data   |
+
+
 ## Facebook Ads
 A platform for managing and optimizing advertising campaigns across Facebook's ecosystem.
 
