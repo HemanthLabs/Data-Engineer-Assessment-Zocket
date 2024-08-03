@@ -148,3 +148,5 @@ Apache Airflow will be used as the primary ETL orchestration tool. It will sched
 5. **Scalability**:
    - **Step 9**: AWS Lambda and Glue jobs scale automatically based on the data volume and processing requirements.
    - **Step 10**: Apache Airflow dynamically adjusts the workflow execution based on task dependencies and resource availability.
+  
+   ![ETL Pipeline Diagram](diagrams/ETL_Pipeline_Diagram.png)
