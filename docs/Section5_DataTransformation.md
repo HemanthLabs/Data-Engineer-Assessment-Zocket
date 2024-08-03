@@ -39,7 +39,7 @@ CREATE TABLE facebook_ads (
 );
 ```
 
-## Python Function
+## Python Function for transformation
 ```python
 import json
 from datetime import datetime
@@ -91,6 +91,40 @@ json_data = '''[
 transformed_data = transform_facebook_ads(json_data)
 print(transformed_data)
 ```
+
+## Loading Data into Redshift
+After transforming the data, the next step is to load it into the AWS Redshift database. We can use the boto3 library to interact with Redshift. The following script demonstrates loading the transformed data into Redshift:
+
+```python
+import psycopg2
+import boto3
+
+# Function to load data into Redshift
+def load_data_to_redshift(data, table_name):
+    conn = psycopg2.connect(
+        dbname='your_db',
+        user='your_user',
+        password='your_password',
+        host='your_redshift_cluster',
+        port='5439'
+    )
+    cursor = conn.cursor()
+    
+    for record in data:
+        insert_query = f"""
+        INSERT INTO {table_name} (ad_id, date_start, date_stop, impressions, clicks, spend, link_clicks, page_engagement)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, record)
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# Load the transformed data
+load_data_to_redshift(transformed_data, 'facebook_ads')
+```
+
 ## Explanation
 
 1. **Loading JSON Data**: The `json.loads` function converts the JSON string into a Python list of dictionaries.
