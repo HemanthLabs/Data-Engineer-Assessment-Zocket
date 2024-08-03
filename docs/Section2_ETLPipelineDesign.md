@@ -4,8 +4,7 @@
 
 ### Data Extraction
 
-#### Facebook Ads
-- **API**: Facebook Marketing API (Graph API)
+#### Facebook Marketing API (Graph API)
 - **Authentication**: OAuth 2.0
 - **Endpoints**: 
   - `/act_{ad_account_id}/ads`
@@ -14,8 +13,7 @@
 - **Data Extraction Frequency**: Hourly to daily, based on campaign activity and reporting needs
 - **Data**: Metrics like impressions, clicks, conversions, spend, ad performance details
 
-#### Google Ads
-- **API**: Google Ads API
+#### Google Ads API
 - **Authentication**: OAuth 2.0
 - **Endpoints**: `customers/{customerId}/googleAds:search`
 - **Data Extraction Frequency**: Hourly to daily, synchronized with Facebook Ads extraction
