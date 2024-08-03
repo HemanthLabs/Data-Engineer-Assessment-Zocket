@@ -1,4 +1,4 @@
-# ETL Pipeline Assessment
+# Data Engineer Assessment
 
 This project demonstrates the design and implementation of ETL pipelines for extracting data from multiple sources, transforming it, and loading it into a data warehouse.
 
