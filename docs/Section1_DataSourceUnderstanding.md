@@ -34,7 +34,6 @@ A platform for managing and optimizing advertising campaigns across Facebook's e
 - **Attributes**: Details such as ad name, ID, campaign ID, targeting details, and creative content.
 - **Format**: Data is returned in JSON format, making it easy to parse and integrate.
 
-![google Ad Datastructure](../diagram/google_ad_datastructure.PNG)
 
 ## Google Ads
 A service for creating and managing online ads that appear in Google search results and across its advertising network.
@@ -42,6 +41,8 @@ A service for creating and managing online ads that appear in Google search resu
 ### Data Structure:
 - **Hierarchy**: Google Ads also follows a hierarchical structure with Campaigns, Ad Groups, and Ads. Campaigns set the overall goal and budget, Ad Groups contain ads and keywords for specific targeting, and Ads are the actual content seen by users.
 - **Purpose**: This structure helps in precise management and optimization of ad campaigns.
+
+![google Ad Datastructure](../diagram/google_ad_datastructure.PNG)
 
 ### API Access:
 - **API**: Accessed through the Google Ads API.
